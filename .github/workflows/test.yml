@@ -10,3 +10,14 @@ jobs:
       - name: Install Emacs
         run: sudo apt-get install -y emacs-nox
       - uses: leotaku/elisp-check@master
+      - name: Test standalone package installation without Macaulay2
+        run: make check
+      - name: Test a real Macaulay2 session
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends macaulay2
+          M2_TEST_COMMAND='M2 --no-readline' make check
+      - uses: actions/upload-artifact@v7
+        with:
+          name: M2-emacs-package
+          path: dist/*.tar

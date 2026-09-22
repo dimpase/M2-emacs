@@ -1,4 +1,4 @@
--- Auto-generated for Macaulay2-1.26.06. Do not modify this file manually. --
+-- Maintained in https://github.com/Macaulay2/M2-emacs --
 
                        Editing Macaulay2 code with Emacs
 

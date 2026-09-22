@@ -1,35 +1,29 @@
 Emacs Package for Macaulay2
 ===========================
 
-To get started with running Macaulay2 with Emacs, look at the file `M2-emacs-help.txt`, which is a text version of the documentation node available via `help "running Macaulay2 in emacs"`. To learn how to edit a file with Macaulay2 code in it using Emacs, see the file `M2-emacs.m2`, which is a text version of the documentation node available via `help "editing Macaulay2 code with emacs"`.
+To get started with running Macaulay2 with Emacs, run `M-x M2-help` to open the bundled `M2-emacs-help.txt`. To learn how to edit a file with Macaulay2 code in it using Emacs, see the file `M2-emacs.m2`, which contains the editing guide.
 
 The files `M2.el` and `M2-mode.el` provide modes for editing Macaulay2 source in Emacs and running a Macaulay2 session within an Emacs buffer. The syntax highlighting symbols are defined in `M2-symbols.el`.
 
 ## Installation
 
-### Installing from a distribution package
+Install this interface independently of the Macaulay2 executable. Package
+installation, syntax highlighting, completion, and the bundled help do not run
+M2. Interactive computations require a local M2 executable or an explicit SSH or
+container command. No `setupEmacs()` call is required.
 
-The Macaulay2 distribution packages typically install the M2-mode package somewhere in the `share/emacs/site-lisp` subdirectory of the installation prefix. For instance, on Ubuntu the package `elpa-macaulay2` is installed along with `macaulay2`, unless installing recommended packages is disabled. Therefore if Macaulay2 is installed from the distribution, this package already exists on your system.
+### Installing an archive (including offline installation)
 
-If Emacs doesn't automatically find the package, you may need to start M2 in a terminal and run:
-```m2
-setupEmacs()
-```
+Download an `M2-<version>.tar` package artifact from a successful GitHub Actions
+run, or build one from a checkout with `make package`. In Emacs, run
+`M-x package-install-file` and select the tar file. Once downloaded, installation
+needs neither a network connection nor a Macaulay2 installation. Do not unpack
+the archive yourself. Emacs installs it, generates autoloads, and byte-compiles it.
 
-<!--
-### Installing from MELPA
-
-Alternatively, for those who would like to install M2-mode without installing Macaulay2 itself, you can install this package from MELPA:
-
-1. Add the following to your Emacs init file (`~/.emacs`) to [enable the MELPA repository](https://melpa.org/#/getting-started):
-```elisp
-(package-initialize)
-
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")))
-```
-
-2. Press `M-x package-list-packages`, then find and install M2-mode.
--->
+The package declares Emacs 24.4 or newer; local standalone installation tests use Ubuntu 24.04 Emacs, and CI uses
+the version provided by ubuntu-latest. The `use-package :vc` example below
+requires Emacs 30. MELPA submission is planned; this README does not assume that
+the package has been accepted into MELPA.
 
 ### Installing with Emacs package managers
 
@@ -48,13 +42,13 @@ This requires Emacs version 30 or greater.
 #### [Quelpa](https://github.com/quelpa/quelpa)
 
 ```elisp
-(quelpa '(M2 :repo "Macaulay2/M2-emacs" :fetcher github :files ("*.el")))
+(quelpa '(M2 :repo "Macaulay2/M2-emacs" :fetcher github :files ("*.el" "M2-emacs-help.txt" "M2-emacs.m2" "M2-session-guide.txt")))
 ```
 
 ####  [straight.el](https://github.com/radian-software/straight.el)
 
 ```elisp
-(straight-use-package '(M2 :type git :host github :repo "Macaulay2/M2-emacs" :files ("*.el")))
+(straight-use-package '(M2 :type git :host github :repo "Macaulay2/M2-emacs" :files ("*.el" "M2-emacs-help.txt" "M2-emacs.m2" "M2-session-guide.txt")))
 ```
 
 ### Installing from the Git Repository
@@ -73,6 +67,81 @@ git clone https://github.com/Macaulay2/M2-emacs.git ~/.emacs.d/site-lisp/Macaula
 ```
 
 Using this method, you can fetch the most recent version of the package by running `git pull` in the `~/.emacs.d/site-lisp/Macaulay2` directory.
+
+The extended session guide is in `M2-session-guide.txt`, alongside the running
+and editing guides shipped in the package.
+
+## Configuration
+
+`M-x M2` starts a session. Opening an `.m2` file selects `M2-mode` automatically.
+For a local installation outside `PATH`, customize `M2-exe`, for example:
+
+```elisp
+(setq M2-exe "/opt/Macaulay2/bin/M2")
+```
+
+When `M2-command` is nil (the default), the command is constructed from `M2-exe`
+each time a new session is started. Existing custom `M2-command` strings remain
+supported. To use a remote or container installation, set the complete shell
+command instead:
+
+```elisp
+(setq M2-command "ssh my-server M2 --no-readline")
+```
+
+`C-u M-x M2` lets you edit the command for a session. Emacs does not install M2
+itself. Use your operating system's package manager or M2's installation guide.
+For nonstandard local documentation locations, customize `M2-info-directory`:
+
+```elisp
+(setq M2-info-directory "/opt/Macaulay2/share/info")
+(setq Info-hide-note-references 'hide)
+(global-set-key (kbd "<f12>") #'M2)
+```
+
+The Info path is used when displaying documentation requested by an M2 session.
+The bundled `M-x M2-help` introduction needs no M2 installation. Remote Info paths
+are not automatically downloaded or translated into local paths.
+
+## Migrating from bundled Emacs support
+
+Older M2 versions supplied the Lisp files and offered `setupEmacs()` to edit
+`~/.emacs` and create `~/.emacs-Macaulay2`. After installing this package:
+
+1. Review the block between `;; Macaulay 2 start` and `;; Macaulay 2 end` in your
+   Emacs init file. Remove the old `(load "~/.emacs-Macaulay2" t)` configuration
+   when it is no longer needed.
+2. Remove obsolete `load-path` entries pointing to M2's bundled `site-lisp`
+   directory, and obsolete explicit loads of `M2-init`. Otherwise they can mask
+   the independently installed package.
+3. Preserve your desired executable, Info path, and key bindings using the
+   settings above; then restart Emacs. `M-x locate-library RET M2` should identify
+   the package-manager installation.
+
+The package never rewrites your init file or deletes an older installation.
+`M2-init.el` remains available for manually managed installations.
+
+## Maintaining and distributing the package
+
+`make package` creates a `package-install-file` archive in `dist/`, using the
+checked-in Lisp and help files. It requires ordinary shell tools, not M2 or
+Emacs. `make check` installs the archive into a temporary Emacs package directory
+and tests that installation with no archive servers configured. CI publishes the
+archive as an artifact. Distribution maintainers can package this repository
+separately from M2, retaining the help files next to `M2.el`.
+
+`make update-symbols M2=/path/to/M2` is a maintainer-only operation using an
+external M2 and its `Style` package. Commit the resulting `M2-symbols.el` after
+review. The symbol list is a snapshot: a newer M2 may provide additional names
+until it is refreshed, without preventing editing or running a session.
+The help files are maintained here directly, not regenerated from M2 core docs.
+Keep the package's supported M2 versions and any incompatible protocol changes
+in the release notes; this initial separation does not change the comint protocol.
+
+A proposed MELPA recipe is in `packaging/M2`. It includes the generated symbols
+and help files and requires no build-time M2. Submit it to MELPA separately once
+this package change has been reviewed. MELPA availability is not required for
+the archive or direct-Git installation paths.
 
 ## Why install M2-mode without Macaulay2?
 
