@@ -3,15 +3,9 @@
 (require 'ert)
 (require 'cl-lib)
 
-(let ((archive (expand-file-name (car (last command-line-args-left))))
-      (test-root (make-temp-file "M2-package-test-" t)))
-  (setq command-line-args-left nil
-        user-emacs-directory (file-name-as-directory test-root)
-        package-user-dir (expand-file-name "elpa" test-root)
-        package-archives nil
-        package-check-signature nil)
-  (package-initialize)
-  (package-install-file archive))
+(load (expand-file-name "install-package.el"
+                        (file-name-directory (or load-file-name buffer-file-name)))
+      nil t)
 
 (ert-deftest M2-package-autoloads ()
   (should (autoloadp (symbol-function 'M2)))

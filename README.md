@@ -103,6 +103,45 @@ The Info path is used when displaying documentation requested by an M2 session.
 The bundled `M-x M2-help` introduction needs no M2 installation. Remote Info paths
 are not automatically downloaded or translated into local paths.
 
+## Language-server support
+
+The Emacs package registers `M2-mode` with both Eglot and lsp-mode. Install one
+of these clients (Eglot is included in Emacs 29 and later), open an `.m2` file,
+and run `M-x eglot` or `M-x lsp`. The language server is supplied by M2's
+`LanguageServer` package and `M2-language-server` executable, not by this Emacs
+package. An older M2 installation may not provide it.
+
+By default, both clients look for `M2-language-server` beside the executable
+selected by `M2-exe`, then fall back to Emacs's `exec-path`. This avoids needing
+`setupEmacs()` to modify `PATH`. For a custom or remote installation, set a list
+of program and arguments (not a shell command string):
+
+```elisp
+(setq M2-language-server-command '("/opt/Macaulay2/bin/M2-language-server"))
+;; Or:
+(setq M2-language-server-command '("ssh" "my-server" "M2-language-server"))
+```
+
+`M2-command` configures the interactive session only; it does not select an LSP
+server. Configure the LSP command separately when using SSH or containers, and
+ensure that the server can access the document paths used by the client.
+A launcher outside `PATH` must itself locate the matching M2 executable; this
+is addressed by Macaulay2/M2#4453. If that fix is absent, ensure the matching M2
+bin directory is on the server process's `PATH` as well.
+
+`make check-lsp` tests discovery and client registration. Client-specific tests
+are skipped when that client is unavailable. To run initialization and completion
+checks against a real server too, set `M2_LSP_TEST_COMMAND` to a Lisp list:
+
+```sh
+M2_LSP_TEST_COMMAND='("/path/to/M2-language-server")' make check-lsp
+```
+
+These tests use a temporary package directory. Make installed client dependencies
+visible with `LSP_EMACS_ARGS` if necessary; CI activates Ubuntu's system ELPA
+package directory. CI runs the real-server checks only when its M2 distribution
+provides `M2-language-server`.
+
 ## Migrating from bundled Emacs support
 
 Older M2 versions supplied the Lisp files and offered `setupEmacs()` to edit

@@ -17,7 +17,10 @@ dist/$(PACKAGE).tar: $(PACKAGE_FILES) Makefile
 check: package
 	$(EMACS) -Q --batch -l tests/package-tests.el -- dist/$(PACKAGE).tar
 
+check-lsp: package
+	$(EMACS) -Q --batch $(LSP_EMACS_ARGS) -l tests/lsp-tests.el -- dist/$(PACKAGE).tar
+
 update-symbols:
 	$(M2) --script generate-symbols.m2
 
-.PHONY: all package check update-symbols
+.PHONY: all package check check-lsp update-symbols
