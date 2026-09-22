@@ -808,9 +808,10 @@ by START and END."
 
 (defcustom M2-language-server-command nil
   "Command and arguments for the Macaulay2 language server.
-When nil, prefer M2-language-server beside `M2-exe', then search `exec-path'.
+When nil, prefer M2-language-server beside `M2-exe', then search
+the variable `exec-path'.
 Set an explicit list for a remote server, for example
-(\"ssh\" \"my-server\" \"M2-language-server\").
+  (\"ssh\" \"my-server\" \"M2-language-server\").
 This is independent of `M2-command', which configures interactive sessions."
   :type '(choice (const :tag "Find beside M2-exe or on exec-path" nil)
                  (repeat string))
@@ -829,6 +830,8 @@ This is independent of `M2-command', which configures interactive sessions."
                   sibling
                 "M2-language-server")))))
 
+;; Register optional clients after they load, without requiring either client
+;; merely to use M2-mode.  This also supports loading clients before M2.
 ;; eglot support
 (defvar eglot-server-programs)
 (with-eval-after-load 'eglot
