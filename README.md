@@ -105,9 +105,28 @@ are not automatically downloaded or translated into local paths.
 
 ## Language-server support
 
-The Emacs package registers `M2-mode` with both Eglot and lsp-mode. Install one
-of these clients (Eglot is included in Emacs 29 and later), open an `.m2` file,
-and run `M-x eglot` or `M-x lsp`. The language server is supplied by M2's
+Choose Eglot or lsp-mode and register `M2-mode` in your Emacs configuration.
+For Eglot (included in Emacs 29 and later):
+
+```elisp
+(with-eval-after-load 'eglot
+  (M2-register-eglot))
+```
+
+For lsp-mode:
+
+```elisp
+(with-eval-after-load 'lsp-mode
+  (M2-register-lsp))
+```
+
+The registration functions are autoloaded by the Emacs package manager. For a
+manual checkout, load `M2` before using them. These configuration forms work
+whether the client is already loaded or is loaded later. Upgrading users should
+add the appropriate form: loading `M2` no longer registers clients automatically.
+
+Open an `.m2` file and run `M-x eglot` or `M-x lsp`.
+The language server is supplied by M2's
 `LanguageServer` package and `M2-language-server` executable, not by this Emacs
 package. An older M2 installation may not provide it.
 

@@ -25,12 +25,16 @@
 
 (ert-deftest M2-lsp-eglot-registration ()
   (skip-unless (require 'eglot nil t))
+  (M2-register-eglot)
+  (M2-register-eglot)
   (let ((M2-language-server-command '("test-server" "--test")))
     (should (equal (funcall (cdr (assq 'M2-mode eglot-server-programs)) nil)
                    M2-language-server-command))))
 
 (ert-deftest M2-lsp-lsp-mode-registration ()
   (skip-unless (require 'lsp-mode nil t))
+  (M2-register-lsp)
+  (M2-register-lsp)
   (should (gethash 'M2 lsp-clients))
   (should (equal (cdr (assq 'M2-mode lsp-language-id-configuration)) "M2")))
 
@@ -41,6 +45,7 @@
 (ert-deftest M2-lsp-eglot-integration ()
   (skip-unless (getenv "M2_LSP_TEST_COMMAND"))
   (require 'eglot)
+  (M2-register-eglot)
   (let* ((directory (make-temp-file "M2-eglot-" t))
          (file (expand-file-name "example.m2" directory))
          (M2-language-server-command (M2-test--server-command))
@@ -72,6 +77,7 @@
 (ert-deftest M2-lsp-lsp-mode-integration ()
   (skip-unless (getenv "M2_LSP_TEST_COMMAND"))
   (require 'lsp-mode)
+  (M2-register-lsp)
   (let* ((directory (make-temp-file "M2-lsp-mode-" t))
          (file (expand-file-name "example.m2" directory))
          (M2-language-server-command (M2-test--server-command))

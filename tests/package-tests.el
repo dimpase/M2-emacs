@@ -9,6 +9,8 @@
 
 (ert-deftest M2-package-autoloads ()
   (should (autoloadp (symbol-function 'M2)))
+  (should (autoloadp (symbol-function 'M2-register-eglot)))
+  (should (autoloadp (symbol-function 'M2-register-lsp)))
   (with-temp-buffer
     (setq buffer-file-name "/tmp/example.m2")
     (set-auto-mode)

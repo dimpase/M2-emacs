@@ -830,11 +830,14 @@ This is independent of `M2-command', which configures interactive sessions."
                   sibling
                 "M2-language-server")))))
 
-;; Register optional clients after they load, without requiring either client
-;; merely to use M2-mode.  This also supports loading clients before M2.
 ;; eglot support
 (defvar eglot-server-programs)
-(with-eval-after-load 'eglot
+;;;###autoload
+(defun M2-register-eglot ()
+  "Register Macaulay2 with Eglot.
+Call this from your configuration after loading Eglot."
+  (unless (featurep 'eglot)
+    (user-error "Load Eglot before calling M2-register-eglot"))
   (add-to-list 'eglot-server-programs '(M2-mode . M2--language-server-command)))
 
 ;; lsp-mode support
@@ -843,7 +846,12 @@ This is independent of `M2-command', which configures interactive sessions."
 (declare-function lsp-stdio-connection "lsp-mode")
 (declare-function make-lsp-client "lsp-mode")
 (defvar lsp-language-id-configuration)
-(with-eval-after-load 'lsp-mode
+;;;###autoload
+(defun M2-register-lsp ()
+  "Register Macaulay2 with lsp-mode.
+Call this from your configuration after loading lsp-mode."
+  (unless (featurep 'lsp-mode)
+    (user-error "Load lsp-mode before calling M2-register-lsp"))
   (add-to-list 'lsp-language-id-configuration '(M2-mode . "M2"))
   (lsp-register-client
    (make-lsp-client
