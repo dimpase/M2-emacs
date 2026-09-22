@@ -5,7 +5,6 @@
 ;; Version: 1.26.06
 ;; Keywords: languages
 ;; URL: https://github.com/Macaulay2/M2-emacs
-;; Package-Requires: ((emacs "24.4"))
 
 ;;; Commentary:
 
