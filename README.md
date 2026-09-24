@@ -10,15 +10,24 @@ The files `M2.el` and `M2-mode.el` provide modes for editing Macaulay2 source in
 Install this interface independently of the Macaulay2 executable. Package
 installation, syntax highlighting, completion, and the bundled help do not run
 M2. Interactive computations require a local M2 executable or an explicit SSH or
-container command. You can run `setupEmacs()` in a recent M2 to add a Git based
-installer and updater to `~/.emacs`, or use one of the manual options below.
+container command. You can run `setupEmacs()` in a recent M2 to add a
+`package.el` installer and updater to `~/.emacs`, or use one of the manual
+options below.
 
 `setupEmacs()` prompts before editing `~/.emacs` and backs up an existing file.
-The inserted block clones this repository into
-`~/.emacs.d/site-lisp/Macaulay2` on the next Emacs startup, then runs
-`git pull --ff-only` on later startups. Git and network access are required for
-the first download. If an update fails, Emacs uses the existing checkout.
-The block also binds F12 to `M2`; remove or customize that line if desired.
+The inserted block installs `M2` from the Macaulay2 package archive on the
+next Emacs startup. On later startups, it checks for a newer package after
+Emacs becomes idle. Network access is required for installation and updates;
+if an update fails, Emacs uses the installed package. The block also binds F12
+to `M2`; remove or customize that line if desired.
+
+The archive is published at
+`https://raw.githubusercontent.com/Macaulay2/M2-emacs/elpa/` after updates to
+the repository's `main` branch. To use Emacs's package menu instead of
+`setupEmacs()`, add the archive to `package-archives`, run
+`M-x package-refresh-contents`, then `M-x package-install RET M2 RET`. Use
+`M-x package-upgrade RET M2 RET` for later updates. The archive contains
+versioned tarballs, so Emacs does not need Git.
 
 ### Installing an archive (including offline installation)
 
@@ -173,7 +182,7 @@ provides `M2-language-server`.
 
 Older M2 versions supplied the Lisp files and offered `setupEmacs()` to edit
 `~/.emacs` and create `~/.emacs-Macaulay2`. The current `setupEmacs()` replaces
-its marked block in `~/.emacs` with the Git based installer, but leaves the old
+its marked block in `~/.emacs` with the `package.el` installer, but leaves the old
 `~/.emacs-Macaulay2` file in place. After installing this package:
 
 1. Review the block between `;; Macaulay 2 start` and `;; Macaulay 2 end` in your
@@ -197,6 +206,12 @@ Emacs. `make check` installs the archive into a temporary Emacs package director
 and tests that installation with no archive servers configured. CI publishes the
 archive as an artifact. Distribution maintainers can package this repository
 separately from M2, retaining the help files next to `M2.el`.
+
+On each push to `main`, the publishing workflow runs `make archive` and updates
+the `elpa` branch. Its `archive-contents` index points to a package tarball with
+a monotonically increasing version. Emacs's built-in `package.el` reads that
+index and installs upgrades from the archive URL above. The workflow needs
+repository Actions permission to write branch contents.
 
 `make update-symbols M2=/path/to/M2` is a maintainer-only operation using an
 external M2 and its `Style` package. Commit the resulting `M2-symbols.el` after

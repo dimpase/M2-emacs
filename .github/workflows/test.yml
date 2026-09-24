@@ -12,6 +12,8 @@ jobs:
       - uses: leotaku/elisp-check@master
       - name: Test standalone package installation without Macaulay2
         run: make check
+      - name: Test package archive installation
+        run: make check-archive
       - name: Test a real Macaulay2 session
         run: |
           sudo apt-get update
